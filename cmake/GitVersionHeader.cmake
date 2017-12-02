@@ -14,6 +14,7 @@
 function(generate_git_version_header GIT_VERSION_HEADER)
     find_package(Git)
 
+    set(GIT_DIR ${CMAKE_SOURCE_DIR}/.git)
     set(GIT_VERSION_HEADER_TMP ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.h_tmp)
     if(WIN32)
         set(GIT_VERSION_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.bat)
@@ -72,10 +73,11 @@ function(generate_git_version_header GIT_VERSION_HEADER)
     # Add an output that is never generated to this custom command, such that it is
     # triggered on every build. copy_if_different ensures that rebuilds are only
     # necessary if the commit id and or branch change.
-    add_custom_command(OUTPUT _git_version_info_force_build_always ${GIT_VERSION_HEADER}
+    add_custom_command(OUTPUT ${GIT_VERSION_HEADER}
         COMMAND ${_SH} ${GIT_VERSION_SCRIPT}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GIT_VERSION_HEADER_TMP} ${GIT_VERSION_HEADER}
         COMMAND ${CMAKE_COMMAND} -E remove ${GIT_VERSION_HEADER_TMP}
+        DEPENDS ${GIT_DIR}/HEAD ${GIT_DIR}/index
         COMMENT "Update git version header ${GIT_VERSION_HEADER}")
 endfunction()
 

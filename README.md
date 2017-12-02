@@ -10,7 +10,8 @@ overcome by forcing CMake to reconfigure on every new git commit (an
 implementation for this can be found at https://github.com/rpavlik/cmake-modules/blob/master/GetGitRevisionDescription.cmake).
 However reconfiguring may be very expensive depending on the size of your
 project. So I propose a solution that adds an explicit build step
-(with `add_custom_command()`) that runs on every build but is very cheap.
+(with `add_custom_command()`) that runs whenever `.git/HEAD` or `.git/index` change,
+but is very cheap.
 
 ### Usage
 
