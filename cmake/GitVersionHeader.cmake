@@ -65,9 +65,9 @@ function(generate_git_version_header GIT_VERSION_HEADER)
     file(APPEND ${GIT_VERSION_SCRIPT} "echo ${_QUOTES}#endif${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
 
     if(WIN32)
-        set(_SH call)
+        find_program(_SH call)
     else()
-        set(_SH sh)
+        find_program(_SH sh)
     endif()
 
     # Add an output that is never generated to this custom command, such that it is
@@ -80,4 +80,3 @@ function(generate_git_version_header GIT_VERSION_HEADER)
         DEPENDS ${GIT_DIR}/HEAD ${GIT_DIR}/index
         COMMENT "Update git version header ${GIT_VERSION_HEADER}")
 endfunction()
-
