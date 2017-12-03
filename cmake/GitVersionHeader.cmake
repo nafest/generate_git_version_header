@@ -14,7 +14,7 @@
 function(generate_git_version_header GIT_VERSION_HEADER)
     find_package(Git)
 
-    set(GIT_DIR ${CMAKE_SOURCE_DIR}/.git)
+    set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.git)
     set(GIT_VERSION_HEADER_TMP ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.h_tmp)
     if(WIN32)
         set(GIT_VERSION_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.bat)
