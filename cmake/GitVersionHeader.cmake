@@ -14,7 +14,7 @@
 function(generate_git_version_header GIT_VERSION_HEADER)
     find_package(Git)
 
-    set(GIT_DIR ${CMAKE_SOURCE_DIR}/.git)
+    set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.git)
     set(GIT_VERSION_HEADER_TMP ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.h_tmp)
     if(WIN32)
         set(GIT_VERSION_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/git_info/git_info.bat)
@@ -27,47 +27,37 @@ function(generate_git_version_header GIT_VERSION_HEADER)
     endif()
 
     file(WRITE ${GIT_VERSION_SCRIPT}
-        "echo ${_QUOTES}#ifndef GIT_VERSION_HEADER${_QUOTES} > ${GIT_VERSION_HEADER_TMP}\n")
-    file(APPEND ${GIT_VERSION_SCRIPT}
+        "echo ${_QUOTES}#ifndef GIT_VERSION_HEADER${_QUOTES} > ${GIT_VERSION_HEADER_TMP}\n"
         "echo ${_QUOTES}#define GIT_VERSION_HEADER${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
     if(Git_FOUND)
         if(WIN32)
             file(APPEND ${GIT_VERSION_SCRIPT}
-                "setlocal enabledelayedexpansion\n")
-            file(APPEND ${GIT_VERSION_SCRIPT}
-                "FOR /F \"delims=\" %%i IN ('\"${GIT_EXECUTABLE}\" log -1 --pretty^=format:%%H') DO set sha1=%%i\n")
-            file(APPEND ${GIT_VERSION_SCRIPT}
-                "echo #define GIT_SHA1_PLAIN %sha1% >> ${GIT_VERSION_HEADER_TMP}\n")
-            file(APPEND ${GIT_VERSION_SCRIPT}
-                "FOR /F \"delims=\" %%i IN ('\"${GIT_EXECUTABLE}\" rev-parse --abbrev-ref HEAD') DO set branch=%%i\n")
-            file(APPEND ${GIT_VERSION_SCRIPT}
+                "setlocal enabledelayedexpansion\n"
+                "FOR /F \"delims=\" %%i IN ('\"${GIT_EXECUTABLE}\" log -1 --pretty^=format:%%H') DO set sha1=%%i\n"
+                "echo #define GIT_SHA1_PLAIN %sha1% >> ${GIT_VERSION_HEADER_TMP}\n"
+                "FOR /F \"delims=\" %%i IN ('\"${GIT_EXECUTABLE}\" rev-parse --abbrev-ref HEAD') DO set branch=%%i\n"
                 "echo #define GIT_BRANCH_PLAIN %branch% >> ${GIT_VERSION_HEADER_TMP}\n")
         else()
             file(APPEND ${GIT_VERSION_SCRIPT}
-                "echo ${_QUOTES}#define GIT_SHA1_PLAIN `${GIT_EXECUTABLE} log -1 --pretty=format:${_QUOTES}%H${_QUOTES}`${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-            file(APPEND ${GIT_VERSION_SCRIPT}
+                "echo ${_QUOTES}#define GIT_SHA1_PLAIN `${GIT_EXECUTABLE} log -1 --pretty=format:${_QUOTES}%H${_QUOTES}`${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
                 "echo ${_QUOTES}#define GIT_BRANCH_PLAIN `${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD`${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
         endif()
     else()
         file(APPEND ${GIT_VERSION_SCRIPT}
-            "echo ${_QUOTES}#define GIT_SHA1_PLAIN no_git_executable_found${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-        file(APPEND ${GIT_VERSION_SCRIPT}
+            "echo ${_QUOTES}#define GIT_SHA1_PLAIN no_git_executable_found${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
             "echo ${_QUOTES}#define GIT_BRANCH_PLAIN no_git_executable_found${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
     endif()
     file(APPEND ${GIT_VERSION_SCRIPT}
-        "echo ${_QUOTES}#define __XGIT_STR(X) #X${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-    file(APPEND ${GIT_VERSION_SCRIPT}
-        "echo ${_QUOTES}#define __GIT_STR(X) __XGIT_STR(X)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-    file(APPEND ${GIT_VERSION_SCRIPT}
-        "echo ${_QUOTES}#define GIT_SHA1 __GIT_STR(GIT_SHA1_PLAIN)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-    file(APPEND ${GIT_VERSION_SCRIPT}
-        "echo ${_QUOTES}#define GIT_BRANCH __GIT_STR(GIT_BRANCH_PLAIN)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
-    file(APPEND ${GIT_VERSION_SCRIPT} "echo ${_QUOTES}#endif${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
+        "echo ${_QUOTES}#define __XGIT_STR(X) #X${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
+        "echo ${_QUOTES}#define __GIT_STR(X) __XGIT_STR(X)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
+        "echo ${_QUOTES}#define GIT_SHA1 __GIT_STR(GIT_SHA1_PLAIN)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
+        "echo ${_QUOTES}#define GIT_BRANCH __GIT_STR(GIT_BRANCH_PLAIN)${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n"
+        "echo ${_QUOTES}#endif${_QUOTES} >> ${GIT_VERSION_HEADER_TMP}\n")
 
     if(WIN32)
-        set(_SH call)
+        find_program(_SH call)
     else()
-        set(_SH sh)
+        find_program(_SH sh)
     endif()
 
     # Add an output that is never generated to this custom command, such that it is
@@ -80,4 +70,3 @@ function(generate_git_version_header GIT_VERSION_HEADER)
         DEPENDS ${GIT_DIR}/HEAD ${GIT_DIR}/index
         COMMENT "Update git version header ${GIT_VERSION_HEADER}")
 endfunction()
-
